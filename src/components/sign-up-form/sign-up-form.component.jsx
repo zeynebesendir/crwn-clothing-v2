@@ -20,7 +20,6 @@ const defaultFormFields = {
 
 const SignUpForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
-
     //Destructure values to use
     const { displayName, email, password, confirmPassword } = formFields;
 
@@ -48,13 +47,12 @@ const SignUpForm = () => {
         }
 
         try {
-            const { user } = await createAuthUserWithEmailAndPassword(
-                email,
-                password
-            );
+            const { user } = await createAuthUserWithEmailAndPassword(email, password);
+
             //Pass user and the displayName to fill the object
+            // Kept this here rather than in usercontext as we need to set the display name
             await createUserDocumentFromAuth(user, { displayName });
-            console.log(user);
+            //console.log(user);
             resetFormFields();
         } catch (error) {
             switch (error.code) {

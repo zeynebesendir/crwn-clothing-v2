@@ -3,9 +3,14 @@ import {
   getAuth,
   signInWithRedirect,
   signInWithPopup,
+
   GoogleAuthProvider,
+
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+
+  signOut,
+  onAuthStateChanged
 } from 'firebase/auth';
 
 //Data(Yazi),Document(Kagit),Folder (Dosya)
@@ -89,3 +94,11 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 
   return await signInWithEmailAndPassword(auth, email, password);
 };
+
+export const signOutUser = async () => await signOut(auth);
+
+//receive a callback and calls it whenever auth changes ex: login,logout
+//it listen all the time. dont forget subscribing where you call
+export const onAuthStateChangedListener = (callback) => {
+  onAuthStateChanged(auth, callback)
+}

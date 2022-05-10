@@ -5,7 +5,6 @@ import Button from '../button/button.component';
 
 import {
     signInWithGooglePopup,
-    createUserDocumentFromAuth,
     signInAuthUserWithEmailAndPassword,
 } from '../../utils/firebase/firebase.utils';
 
@@ -25,23 +24,18 @@ const SignInForm = () => {
     };
 
     const signInWithGoogle = async () => {
-        const { user } = await signInWithGooglePopup();
-        console.log(user);
-        await createUserDocumentFromAuth(user);
+        await signInWithGooglePopup();
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         try {
-            const response = await signInAuthUserWithEmailAndPassword(
-                email,
-                password
-            );
-            //should get token in the response
-            console.log(response);
+            await signInAuthUserWithEmailAndPassword(email, password);
             resetFormFields();
         } catch (error) {
+            console.log('user sign in failed', error);
+            /*
             switch (error.code) {
                 case 'auth/wrong-password':
                     alert('incorrect password for email');
@@ -51,7 +45,7 @@ const SignInForm = () => {
                     break;
                 default:
                     console.log(error);
-            }
+            }*/
         }
     };
 
@@ -89,7 +83,7 @@ const SignInForm = () => {
                     When an error accours, form tries to submit so we see an alert popup
                     TO prevent this, set button type as button */}
                     <Button type='button' buttonType='google' onClick={signInWithGoogle}>
-                        Google sign in
+                        Sign In With Google
                     </Button>
                 </div>
             </form>
