@@ -4,6 +4,8 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from 'firebase/auth';
 
 //Data(Yazi),Document(Kagit),Folder (Dosya)
@@ -23,25 +25,28 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 //set up the authentication -first create the provider
-//youcan have multiple provider
-const provider = new GoogleAuthProvider();
+//you can have multiple provider such as Facebook,Twitter etc
+const googleProvider = new GoogleAuthProvider();
 
 //set up provider settings
 //when someone reached, force them to select an account
-provider.setCustomParameters({
+googleProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
 //you will have only one auth
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
 
 
 //init firestore to acces DB
 export const db = getFirestore();
 
 
-export const createUserDocumentFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
+
+  if (!userAuth) return;
 
   //check If there is a document ref of the user in the db
   const userDocRef = doc(db, 'users', userAuth.uid);//DB, Collection(users), user uid
@@ -59,6 +64,7 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        ...additionalInformation
       });
     } catch (error) {
       console.log('error creating the user', error.message);
@@ -66,4 +72,20 @@ export const createUserDocumentFromAuth = async (userAuth) => {
   }
 
   return userDocRef;
+};
+
+/*
+We havent use the createUserWithEmailAndPassword directy as firebase could change the method names
+User your own function (createAuthUserWithEmailAndPassword) in the app to keep the changes minimal   */
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
+
+//interface layer 
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return await signInWithEmailAndPassword(auth, email, password);
 };
