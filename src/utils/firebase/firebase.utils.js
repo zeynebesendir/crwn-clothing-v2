@@ -14,7 +14,16 @@ import {
 } from 'firebase/auth';
 
 //Data(Yazi),Document(Kagit),Folder (Dosya)
-import { getFirestore, doc, getDoc, setDoc, collection, writeBatch } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  writeBatch,
+  query,
+  getDocs
+} from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -69,6 +78,24 @@ export const addCollectionAndDocuments = async (
   //await for the batch to finish
   await batch.commit();
   console.log('done');
+};
+
+export const getCategoriesAndDocuments = async () => {
+  const collectionRef = collection(db, 'categories');
+
+  //get the object for querying the collection
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+
+  //reduce the docs to get category map
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    acc[title.toLowerCase()] = items;
+    return acc;
+  }, {});
+
+  return categoryMap;
 };
 
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
