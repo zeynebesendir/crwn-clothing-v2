@@ -10,11 +10,11 @@ import {
   signInWithEmailAndPassword,
 
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from 'firebase/auth';
 
 //Data(Yazi),Document(Kagit),Folder (Dosya)
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, writeBatch } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -48,6 +48,28 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googlePro
 //init firestore to acces DB
 export const db = getFirestore();
 
+//to add our data automaticly to thr firebase db
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  //batch is used to ensure writing is completed both sides to consider it is a succesfull action
+  //ex: bank money transfer example
+  const batch = writeBatch(db);
+  //create a collection in the db ('categories')
+  //use the collection ref to add items 
+  const collectionRef = collection(db, collectionKey);
+
+  objectsToAdd.forEach((object) => {
+    //create objects in the collection by using the collection ref
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+
+  //await for the batch to finish
+  await batch.commit();
+  console.log('done');
+};
 
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
 
